@@ -1,17 +1,21 @@
 
 # -*- coding: UTF-8 -*-
-import numpy as np
 import random
+import sys
 from PIL import Image
 
-im = Image.open('Sea.jpg')
-print im.mode,im.size,im.format
+image_path=str(sys.argv[1])
+k=int(sys.argv[2])
+print('k=' + str(k))
+
+im = Image.open(image_path)
+print(im.mode,im.size,im.format)
 #RGB　８-bit 0~255
 pix = im.load()
-width = im.size[0]  #481
-height = im.size[1] #321
+width = int(im.size[0])  #图片的宽
+height = int(im.size[1]) #图片的高
 
-k=4 #设定簇数目
+#设定簇数目
 k_class=[[0 for i in range(3)] for i in range(k)]
 
 pix_class=[[0 for i in range(height) ]for i in range(width)]
@@ -20,7 +24,7 @@ for x in range(k):
     for y in range(3):
         k_class[x][y]=random.randrange(0,255,1)
 
-print k_class
+print(k_class)
 flag=1
 while flag==1:
     next_k_class = [[0 for i in range(3)] for i in range(k)]
@@ -46,8 +50,8 @@ while flag==1:
     for x in range(k):
         for y in range(3):
             if k_class_num[x] != 0:
-                next_k_class[x][y] = next_k_class[x][y] / k_class_num[x]#重新计算中心点，这里取平均值
-    print next_k_class
+                next_k_class[x][y] = next_k_class[x][y] // k_class_num[x]#重新计算中心点，这里取平均值
+    print(next_k_class)
     flag=0
     for x in range(k):
         if next_k_class[x][0:3] != k_class[x][0:3]: #还有类未固定
@@ -56,10 +60,11 @@ while flag==1:
     for x in range(k):
         k_class[x][0:3] = next_k_class[x][0:3]
 #聚类结束
-im_new=Image.new("RGB",(481,321))
+im_new=Image.new("RGB",(width,height))
 for x in range(width):
     for y in range(height):
         r,g,b= k_class[pix_class[x][y]][0:3]
         im_new.putpixel((x,y),(r,g,b))
 im_new.show()
-im_new.save('sea2.jpg')
+result_pic='result_picture_k='+str(k)+'.jpg'
+im_new.save(result_pic)
